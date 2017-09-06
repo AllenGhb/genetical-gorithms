@@ -83,6 +83,9 @@ public class Population {
         return population[offset];
     }
 
+    /**
+     * 种群交叉洗牌
+     */
     public void shuffle(){
         Random rnd = new Random();
         for(int i = population.length - 1;i >0;i--){

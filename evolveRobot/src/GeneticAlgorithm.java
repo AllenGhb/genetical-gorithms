@@ -77,6 +77,25 @@ public class GeneticAlgorithm {
     }
 
     /**
+     * 使用锦标赛选择方法选择父代
+     */
+    public Individual selectParent(Population population){
+        //设置锦标赛规模
+        Population tournament = new Population(tournamentSize);
+
+        population.shuffle();
+        for(int i = 0 ;i<this.tournamentSize; i++){
+            Individual tournamentIndividual = population.getIndividual(i);
+            tournament.setIndividual(i,tournamentIndividual);
+        }
+
+        //返回最佳值
+        return tournament.getFittest(0);
+
+    }
+
+
+    /**
      * 基因变异
      */
     public Population mutatePopulation(Population population){
@@ -109,6 +128,47 @@ public class GeneticAlgorithm {
         return newPopulation;
 
     }
+
+
+    /**
+     * 基因重组 ，单点交叉
+     */
+    public Population crossoverPopulation(Population population){
+        //创建新的种群
+        Population newPopulation = new Population(population.size());
+
+        for(int populationIndex = 0; populationIndex < population.size();populationIndex++){
+            Individual parent1 = population.getFittest(populationIndex);
+
+            if(this.crossoverRate > Math.random() && populationIndex >= this.elitismCount){
+                // 种群后代
+                Individual offspring = new Individual(parent1.getChromosomeLength());
+
+                // 选择第二个父代
+                Individual parent2 = this.selectParent(population);
+
+                //获取随机交叉点
+                int swapPoint = (int)(Math.random() * (parent1.getChromosomeLength()+1));
+
+                //遍历基因
+                for(int geneIndex = 0;geneIndex < parent1.getChromosomeLength();geneIndex++){
+                    //如果基因位置小于交叉点，使用父代1的基因，否则，选择父代2的
+                    if(geneIndex < swapPoint){
+                        offspring.setGene(geneIndex,parent1.getGene(geneIndex));
+                    }else{
+                        offspring.setGene(geneIndex,parent2.getGene(geneIndex));
+                    }
+                }
+                //添加后代到新的种群中
+                newPopulation.setIndividual(populationIndex,offspring);
+            }else{
+                newPopulation.setIndividual(populationIndex,parent1);
+            }
+        }
+
+        return newPopulation;
+    }
+
 
 
 }
