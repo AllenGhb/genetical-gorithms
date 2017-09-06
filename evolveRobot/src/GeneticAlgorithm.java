@@ -102,14 +102,14 @@ public class GeneticAlgorithm {
         // 初始化新种群
         Population newPopulation = new Population(populationSize);
 
-        for(int ppopulationIndex = 0; ppopulationIndex < population.size();ppopulationIndex++){
+        for(int populationIndex = 0; populationIndex < population.size();populationIndex++){
             // 根据适应度排序,选择最优值
-            Individual individual = population.getFittest(ppopulationIndex);
+            Individual individual = population.getFittest(populationIndex);
 
             //遍历个体基因
             for(int geneIndex = 0; geneIndex < individual.getChromosomeLength(); geneIndex++){
                 // 跳过突变，如果这是一个精英个体
-                if(ppopulationIndex >= this.elitismCount){
+                if(populationIndex >= this.elitismCount){
                     if(mutationRate > Math.random()){
                         // 获取新基因
                         int newGene = 1;
@@ -121,7 +121,7 @@ public class GeneticAlgorithm {
                 }
             }
 
-            newPopulation.setIndividual(ppopulationIndex,individual);
+            newPopulation.setIndividual(populationIndex,individual);
 
         }
 
