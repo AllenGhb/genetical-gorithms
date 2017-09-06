@@ -1,5 +1,6 @@
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Random;
 
 /**
  * @Discription: 一个种群或个体的一个世代,并对它们应用群组级别的操作
@@ -84,5 +85,18 @@ public class Population {
      */
     public Individual getIndividual(int offset){
         return population[offset];
+    }
+
+    /**
+     * 交叉洗牌
+     */
+    public void shuffle(){
+        Random rnd = new Random();
+        for(int i = population.length - 1;i>0;i--){
+            int index = rnd.nextInt(i+1);
+            Individual a = population[index];
+            population[index] = population[i];
+            population[i] = a;
+        }
     }
 }
