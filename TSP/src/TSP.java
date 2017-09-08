@@ -24,6 +24,33 @@ public class TSP {
         GeneticAlgorithm ga = new GeneticAlgorithm(100,0.001,0.9,2,5);
         // 实例化种群和个体类
         Population population = ga.initPopulation(cities.length);
+        // 评估
+        ga.evalPopulation(population,cities);
+
+        Route startRoute = new Route(population.getFittest(0),cities);
+        System.out.println("开始距离: " + startRoute.getDistance());
+        // 世代数目
+        int generation = 1;
+        // 循环评估
+        while(ga.isTerminationConditionMet(generation,maxGenerations) == false){
+            // 显示种群中最优的个体
+            Route route = new Route(population.getFittest(0),cities);
+            System.out.println("G" + generation +" 最优距离: " + route.getDistance());
+
+            // 基因重组
+            population = ga.crossoverPopulation(population);
+            // 基因变异
+            population = ga.mutatePopulation(population);
+            // 重新评估
+            ga.evalPopulation(population,cities);
+
+            generation++;
+
+        }
+
+        System.out.println("迭代之前的最大迭代次数 :" + maxGenerations + "generations.");
+        Route route = new Route(population.getFittest(0), cities);
+        System.out.println("最优距离 :" + route.getDistance());
 
     }
 

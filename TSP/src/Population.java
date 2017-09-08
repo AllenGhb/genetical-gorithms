@@ -25,7 +25,7 @@ public class Population {
      * 初始化种群规模,并创建每一条染色体
      */
     public Population(int populationSize,int chromosomeLength){
-        population = new Individual[chromosomeLength];
+        population = new Individual[populationSize];
         for(int individualCount = 0;individualCount <populationSize;individualCount++){
             Individual individual = new Individual(chromosomeLength);
             population[individualCount] = individual;

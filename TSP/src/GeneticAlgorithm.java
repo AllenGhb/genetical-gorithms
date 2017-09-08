@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 /**
  * 二进制遗传算法
  * 抽象了遗传算法本身，为接口方法提供了针对问题的实现，如交叉、变异、适应度评估和终止条件检查
@@ -67,11 +69,11 @@ public class GeneticAlgorithm {
     /**
      * 整体评估
      */
-    public void evalPopulation(Population population,City cites[]){
+    public void evalPopulation(Population population,City cities[]){
         double populationFitness = 0;
 
         for(Individual individual : population.getIndividuals()){
-            populationFitness += calcFitness(individual,cites);
+            populationFitness += calcFitness(individual,cities);
         }
 
         double avgFitness = populationFitness / population.size();
@@ -108,20 +110,20 @@ public class GeneticAlgorithm {
             // 根据适应度排序,选择最优值
             Individual individual = population.getFittest(populationIndex);
 
-            //遍历个体基因
-            for(int geneIndex = 0; geneIndex < individual.getChromosomeLength(); geneIndex++){
-                // 跳过突变，如果这是一个精英个体
-                if(populationIndex >= this.elitismCount){
-                    if(mutationRate > Math.random()){
-                        // 获取新基因
-                        int newGene = 1;
-                        if(individual.getGene(geneIndex) == 1){
-                            newGene = 0;
-                        }
-                        individual.setGene(geneIndex,newGene);
+            if(populationIndex >= elitismCount){
+                for(int geneIndex = 0 ; geneIndex < individual.getChromosomeLength() ;geneIndex++){
+                    if(this.mutationRate > Math.random()){
+                        int newGenePos = (int) (Math.random() * individual.getChromosomeLength());
+
+                        int gene1 = individual.getGene(newGenePos);
+                        int gene2 = individual.getGene(geneIndex);
+
+                        individual.setGene(geneIndex,gene1);
+                        individual.setGene(newGenePos,gene2);
                     }
                 }
             }
+
 
             newPopulation.setIndividual(populationIndex,individual);
 
@@ -133,35 +135,58 @@ public class GeneticAlgorithm {
 
 
     /**
-     * 基因重组 ，单点交叉
+     * 基因重组,有序交叉突变
      */
     public Population crossoverPopulation(Population population){
         //创建新的种群
         Population newPopulation = new Population(population.size());
 
         for(int populationIndex = 0; populationIndex < population.size();populationIndex++){
+
+            // 获取第一个父代
             Individual parent1 = population.getFittest(populationIndex);
 
+
             if(this.crossoverRate > Math.random() && populationIndex >= this.elitismCount){
-                // 种群后代
-                Individual offspring = new Individual(parent1.getChromosomeLength());
 
                 // 选择第二个父代
                 Individual parent2 = this.selectParent(population);
 
-                //获取随机交叉点
-                int swapPoint = (int)(Math.random() * (parent1.getChromosomeLength()+1));
+                // 创建空白后代染色体
+                int offspringChromosome[] = new int[parent1.getChromosomeLength()];
+                Arrays.fill(offspringChromosome,-1);
+                Individual offspring = new Individual(offspringChromosome);
 
-                //遍历基因
-                for(int geneIndex = 0;geneIndex < parent1.getChromosomeLength();geneIndex++){
-                    //如果基因位置小于交叉点，使用父代1的基因，否则，选择父代2的
-                    if(geneIndex < swapPoint){
-                        offspring.setGene(geneIndex,parent1.getGene(geneIndex));
-                    }else{
-                        offspring.setGene(geneIndex,parent2.getGene(geneIndex));
+                // 获取父染色体的子集
+                int substrPos1 = (int) (Math.random() * parent1.getChromosomeLength());
+                int substrPos2 = (int) (Math.random() * parent1.getChromosomeLength());
+
+                final int startSubstr = Math.min(substrPos1,substrPos2);
+                final int endSubstr = Math.max(substrPos1,substrPos2);
+
+                // 将父代的某段基因遗传给下一代
+                for( int i = startSubstr; i < endSubstr ; i++){
+                    offspring.setGene(i,parent1.getGene(i));
+                }
+
+                for(int i=0 ; i < parent2.getChromosomeLength();i++){
+                    int parent2Gene = i + endSubstr;
+                    if(parent2Gene >= parent2.getChromosomeLength()){
+                        parent2Gene -= parent2.getChromosomeLength();
+                    }
+
+                    // 如果后代染色体中不存在此城市则添加
+                    if(offspring.containsGene(parent2.getGene(parent2Gene)) == false){
+                        for(int ii = 0; ii < offspring.getChromosomeLength();ii++){
+                            if(offspring.getGene(ii) == -1){
+                                offspring.setGene(ii,parent2.getGene(parent2Gene));
+                                break;
+                            }
+                        }
                     }
                 }
-                //添加后代到新的种群中
+
+                // 新种群中添加新生成的后代
                 newPopulation.setIndividual(populationIndex,offspring);
             }else{
                 newPopulation.setIndividual(populationIndex,parent1);

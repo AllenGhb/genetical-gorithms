@@ -44,9 +44,9 @@ public class RobotController {
                     + "): " + fittest.toString());
 
             // 基因重组
-            ga.crossoverPopulation(population);
+            population = ga.crossoverPopulation(population);
             // 基因变异
-            ga.mutatePopulation(population);
+            population = ga.mutatePopulation(population);
             // 重新评估
             ga.evalPopulation(population,maze);
 

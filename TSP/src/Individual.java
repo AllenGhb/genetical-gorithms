@@ -21,15 +21,14 @@ public class Individual {
      * 随机创建一条染色体
      */
     public Individual(int chromosomeLength){
-        this.chromosome = new int[chromosomeLength];
+
+        int[] individual;
+        individual = new int[chromosomeLength];
         for(int gene=0;gene < chromosomeLength ;gene++){
-            // 1/2概率基因是0或1
-            if(0.5 < Math.random()){
-                setGene(gene,1);
-            }else {
-                setGene(gene,0);
-            }
+           individual[gene] = gene;
         }
+
+        this.chromosome = individual;
     }
 
     /**
@@ -72,7 +71,7 @@ public class Individual {
     public String toString() {
         String output = "";
         for(int gene = 0 ; gene <chromosome.length;gene++){
-            output += chromosome[gene];
+            output += chromosome[gene] + ",";
         }
         return output;
     }
